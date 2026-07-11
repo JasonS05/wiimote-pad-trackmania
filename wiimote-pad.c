@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <math.h>
 
 #include <xwiimote.h>
 
@@ -78,13 +79,13 @@ void err_check(int code, char const *str) {
 	_BUTTON(XWII_KEY_RIGHT, BTN_DPAD_UP); \
 
 #define OTHER_BUTTONS \
-	_BUTTON(XWII_KEY_A, BTN_A); \
-	_BUTTON(XWII_KEY_B, BTN_B); \
+	_BUTTON(XWII_KEY_A, BTN_X); \
+	_BUTTON(XWII_KEY_B, BTN_Y); \
 	_BUTTON(XWII_KEY_PLUS, BTN_TL); \
 	_BUTTON(XWII_KEY_MINUS, BTN_TR); \
 	_BUTTON(XWII_KEY_HOME, BTN_MODE); \
-	_BUTTON(XWII_KEY_ONE, BTN_1); \
-	_BUTTON(XWII_KEY_TWO, BTN_2); \
+	_BUTTON(XWII_KEY_ONE, BTN_B); \
+	_BUTTON(XWII_KEY_TWO, BTN_A); \
 
 #define BUTTONS_LANDSCAPE do { \
 	DPAD_LANDSCAPE \
@@ -166,10 +167,10 @@ void dev_init(struct wiimote_dev const *dev, struct input_event *iev) {
 #undef _BUTTON
 
 	set_ev(EV_ABS);
-	set_abs(ABS_X, -AXIS_MAX, AXIS_MAX, 2, 4);
+	set_abs(ABS_X, -AXIS_MAX, AXIS_MAX, 0, 0);
 	iev[11].type = EV_ABS;
 	iev[11].code = ABS_X;
-	set_abs(ABS_Y, -AXIS_MAX, AXIS_MAX, 2, 4);
+	set_abs(ABS_Y, -AXIS_MAX, AXIS_MAX, 0, 0);
 	iev[12].type = EV_ABS;
 	iev[12].code = ABS_Y;
 
@@ -231,11 +232,14 @@ static void wiimote_accel(struct wiimote_dev *dev, struct xwii_event const *ev)
 {
 	struct input_event *iev = dev->iev;
 
-	iev[11].value = -(ev->v.abs[0].y);
-	iev[12].value = -(ev->v.abs[0].x);
+	double y = -(34.0 + ev->v.abs[0].y);
+	double x = -(34.0 + ev->v.abs[0].x);
+
+	iev[11].value = atan2(y, x) / M_PI * 100.0 * 180.0 / 45.0;
 
 	CLIP_AXIS(iev[11].value);
-	CLIP_AXIS(iev[12].value);
+
+	printf("\33[A\33[2K%d\n", iev[11].value);
 
 	if (dev->uinput > 0) {
 		int ret = write(dev->uinput, iev + 11, sizeof(*iev));
@@ -398,7 +402,7 @@ exit_udev:
 	udev_unref(udev);
 exit:
 	if (!ret) {
-		printf("\twith D-pad in %s mode\n",
+		printf("\twith D-pad in %s mode\n\n",
 			dev->dpad_portrait ? "portrait" : "landscape");
 	}
 	return ret;

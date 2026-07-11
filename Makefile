@@ -12,6 +12,7 @@ LDFLAGS ?=
 LDFLAGS += -L$(XWIIMOTE)/.libs
 LDLIBS += -ludev
 LDLIBS += -lxwiimote
+LDLIBS += -lm
 
 wiimote-pad: wiimote-pad.c
 
