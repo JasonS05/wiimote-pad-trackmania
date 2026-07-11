@@ -1,11 +1,12 @@
-This is a fork I made to suit my own needs, which is to say map Wiimote controls in a way that works well with Trackmania (once appropriate keybindings are set in Trackmania). Note that this fork, as well as the original, requires the following packages to be installed if you are using Ubuntu (as I am):
+This is a fork I made to suit my own needs, which is to say map Wiimote controls in a way that works well with Trackmania (once appropriate keybindings are set in Trackmania). Note that this fork, as well as the original repository, requires the following packages to be installed if you are using Ubuntu (as I am):
 
 - `xwiimote`
 - `libxwiimote-dev`
+- possibly others, raise a github issue if you find one
 
 For connecting your Wiimote, guides should be available for how to do so with xwiimote. This repository assumes you have already figured out how to connect your Wiimote.
 
-If you want to change the keybindings, look at lines 68 to 88 in `wiimote-pad.c`. If you want to change the steering sensitivity, go to line 238 in `wiimote-pad.c`. By default, the steering reaches maximum when turning 45 degrees away froy from center (meaning 90 degree total range).
+If you want to change the keybindings, look at lines 68 to 88 in `wiimote-pad.c`. If you want to change the steering sensitivity, go to line 238 in `wiimote-pad.c`. By default, the steering reaches maximum when turning 45 degrees away from center (meaning 90 degree total range).
 
 The rest of this README is as found in the original repository.
 
