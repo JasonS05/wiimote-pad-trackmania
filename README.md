@@ -1,12 +1,40 @@
-This is a fork I made to suit my own needs, which is to say map Wiimote controls in a way that works well with Trackmania (once appropriate keybindings are set in Trackmania). Note that this fork, as well as the original repository, requires the following packages to be installed if you are using Ubuntu (as I am):
+This is a fork I made to suit my own needs, which is to say map Wiimote controls in a way that works well with Trackmania (once appropriate keybindings are set in Trackmania). You may want to disable the steam overlay to prevent it from coming up when pressing certain buttons on the Wiimote (I find that the '+' button triggers it for me).
 
-- `xwiimote`
-- `libxwiimote-dev`
-- possibly others, raise a github issue if you find one
+To install on Ubuntu Linux, first clone the repository into a directory of your choice and navigate into the cloned repository:
 
-For connecting your Wiimote, guides should be available for how to do so with xwiimote. This repository assumes you have already figured out how to connect your Wiimote.
+```bash
+git clone https://github.com/jasons05/wiimote-pad-trackmania.git
+cd wiimote-pad-trackmania
+```
 
-If you want to change the keybindings, look at lines 68 to 88 in `wiimote-pad.c`. If you want to change the steering sensitivity, go to line 238 in `wiimote-pad.c`. By default, the steering reaches maximum when turning 45 degrees away from center (meaning 90 degree total range).
+Then make sure you have the necessary dependencies installed:
+
+```bash
+sudo apt update
+sudo apt install xwiimote libxwiimote-dev
+```
+
+And finally compile the project:
+
+```bash
+make
+```
+
+This last step will create an executable called `wiimote-pad`.
+
+If you are on a Linux distribution other than Ubuntu, the process of installing dependencies will potentially differ but the rest should be the same. If your distribution uses the `apt` package manager then the above installation instructions can likely be followed as-is.
+
+When running this utility, a Wiimote must already be connected. To connect a Wiimote, you must first make sure that `xwiimote` is already installed. In terminal, run the `bluetoothctl` command which will put you into an interactive session with the `bluetoothctl` utility. In this session, run the command `scan on` to start scanning for devices. Once you have run this command, press the red button under the battery cover of your Wiimote. This will cause the Wiimote to broadcast itself for several seconds, which will be indicated by the Wiimote LEDs flashing. During this time period, take note of the address of the Wiimote (should look something like `01:23:45:67:89:AB` but with random numbers and letters, and can be identified from other devices because it is labeled as Nintendo). This is best done by copying the address to the clipboard. Once the address is copied, pair it by running `pair <address>` (e.g. `pair 01:23:45:67:89:AB` for a hypothetical Wiimote with that address). Once it is paired, connect with `connect <address>`. If this succeeds, the Wiimote should stop flashing and show one lit LED. Once the Wiimote has connected, you should finally run `trust <address>` to trust the Wiimote. At this point, the Wiimote has been successfully connected and `bluetoothctl` may be exited with Ctrl-D.
+
+If you are too slow and the Wiimote gives up connecting, simply run `remove <address>` in your `bluetoothctl` session and start the process all over again (note that the address doesn't change, so you won't have to worry about that again if you copied it down the first time). The Wiimote might have to be in search mode (blinking lights, triggered with the red button under the battery cover) for `bluetoothctl` to be able to remove the device.
+
+If you are doing everything correctly but when running `connect <address>` the Wiimote fails to stop blinking and eventually just turns off, it is most likely because `xwiimote` is not installed. `xwiimote` is required for the computer to successfully connect in a way the Wiimote recognizes.
+
+Once the Wiimote has been successfully connected according to the instructions outlined above, the Wiimote will remember the computer and automatically connect in the future whenever any button on the Wiimote is pressed. Note that this can easily lead to the Wiimote turning on and connecting by accident which can drain the battery, so be careful.
+
+Once your Wiimote has connected, simply run the `wiimote-pad` executable. This executable will display a number from -100 to 100 which indicates your current steering angle. -100 is maximum steering left and 100 is maximum steering right. If you turn off the Wiimote the executable will automatically exit with error code 0. If you do not have a Wiimote connected when attempting to run the executable, it will give the message `no joysticks found` and exit immediately with error code 19. Note that the executable does not run automatically when the Wiimote connects. You will have to run it manually each time.
+
+If you want to change the mapping between Wiimote buttons and emulated gamepad buttons, look at lines 68 to 88 in `wiimote-pad.c`. If you want to change the steering sensitivity, go to line 238 in `wiimote-pad.c`. By default, the steering has a range of 90 degrees (meaning that maximum steering is attained at 45 degrees away from neutral, which is how the code represents it).
 
 The rest of this README is as found in the original repository.
 
